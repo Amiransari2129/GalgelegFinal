@@ -75,8 +75,6 @@ public class Highscore extends AppCompatActivity {
                 rv.setAdapter(rvAdapter);
             }
         });
-
-        Log.d(TAG, "onCreate: " + allHSList);
     }
 
     private void loadScoreData() {

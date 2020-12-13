@@ -36,8 +36,8 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
     AlertDialog.Builder afslutSpil;
     int score = 0;
 
+    // Sp til HS fyldt med score.
     ArrayList<String> scoreArrList = new ArrayList<>();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -205,6 +205,7 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                     dialog.cancel();
                 }
             });
+
             scoreArrList.add(String.valueOf(score));
             scoreData();
 
@@ -233,6 +234,7 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                     dialog.cancel();
                 }
             });
+
             scoreArrList.add(String.valueOf(score));
             scoreData();
 
@@ -272,13 +274,14 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
+    // nåede ikke at få det til at virke.
     private void scoreData() {
         SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
         SharedPreferences.Editor edit = sp.edit();
         Gson gson = new Gson();
         String json = gson.toJson(scoreArrList);
         edit.putString("scoreList", json);
-        edit.apply();
+        edit.commit();
     }
 
     private void loadScoreData() {
