@@ -1,10 +1,11 @@
 package com.example.galgelegreallyfinal;
 
 
-
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -17,6 +18,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Array;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Set;
 import java.util.concurrent.Executors;
 
 public class Play extends AppCompatActivity implements View.OnClickListener {
@@ -28,14 +36,13 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
     AlertDialog.Builder afslutSpil;
     int score = 0;
 
-    Intent i = new Intent(Play.this, Highscore.class);
+    ArrayList<String> scoreArrList = new ArrayList<>();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_layout);
-
 
         Button menuBTN = (Button) findViewById(R.id.menuBTN);
 
@@ -46,8 +53,6 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
-
-
         skjultOrd = (TextView) findViewById(R.id.skjultOrd);
         galgeIMG = (ImageView) findViewById(R.id.imgGalge);
         tvScore = (TextView) findViewById(R.id.textScore);
@@ -56,10 +61,11 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
         afslutSpil = new AlertDialog.Builder(this);
 
         // start spillet
+
         Executors.newSingleThreadExecutor().execute(() -> {
             try {
                 spil.hentOrdFraDr();
-               // spil.nulstil();
+                // spil.nulstil();
                 new Handler(Looper.getMainLooper()).post(new Runnable() {
                     @Override
                     public void run() {
@@ -153,24 +159,28 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
         Button Z = findViewById(R.id.Z);
         Z.setOnClickListener(this);
 
-
     }
 
+
     private int points() {
+
         if (spil.erSidsteBogstavKorrekt()) {
             score = score + 10;
         } else {
             score = score - 10;
         }
         tvScore.setText("Score: " + score);
-        i.putExtra("userScore", score);
+
         return score;
     }
 
     private void slutSpil() {
         AlertDialog slutBesked;
+        SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
 
         if (spil.erSpilletVundet()) {
+
             afslutSpil.setMessage("You Have won! with a score of " + score + "\nThe word was '" + spil.getOrdet() + "'");
             afslutSpil.setCancelable(true);
 
@@ -187,10 +197,18 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                     dialog.cancel();
                 }
             });
+            scoreArrList.add(String.valueOf(score));
+            scoreData();
+
+            edit.putInt("userScore", score);
+            edit.commit();
+
             slutBesked = afslutSpil.create();
             slutBesked.show();
 
+
         } else if (spil.erSpilletTabt()) {
+
             afslutSpil.setMessage("You Have Lost! with a score of " + score + "\nThe word was '" + spil.getOrdet() + "'");
             afslutSpil.setCancelable(true);
 
@@ -207,10 +225,15 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                     dialog.cancel();
                 }
             });
+            scoreArrList.add(String.valueOf(score));
+            scoreData();
+
+            edit.putInt("userScore", score);
+            edit.commit();
+
             slutBesked = afslutSpil.create();
             slutBesked.show();
         }
-
     }
 
     private void imgChanger() {
@@ -236,6 +259,28 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
             case 7:
                 galgeIMG.setImageResource(R.drawable.forkert6);
                 break;
+        }
+    }
+
+    private void scoreData() {
+        SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(scoreArrList);
+        edit.putString("scoreList", json);
+        edit.apply();
+    }
+
+    private void loadScoreData() {
+        SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sp.getString("score_pref", null);
+        Type type = new TypeToken<ArrayList<ScoreExample>>() {
+        }.getType();
+        scoreArrList = gson.fromJson(json, type);
+
+        if (scoreArrList == null){
+            scoreArrList = new ArrayList<>();
         }
     }
 
