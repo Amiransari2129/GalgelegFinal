@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">GalgelegReallyFinal</string>
+    <string name="play">PLAY</string>
+    <string name="highscore">HIGHSCORE</string>
+    <string name="words">WORDS</string>
+    <string name="help">HELP</string>
+    <string name="Title">GALGELEG</string>
+    <string name="menu">MENU</string>
+    <string name="MMimg">MainMenuPic</string>
+    <string name="potential_words">Potential Words</string>
+    <string name="instructions_help">
+        1. A random word will be chosen for you to guess.\n\n
+        2. Start guessing letters using the built in keyboard. You can only guess one letter once.\n\n
+        3. If you guess correctly, the letter will appear on a display to show you what letters you have guessed correctly.\n\n
+        4. You have 6 lives to guess the whole word.\n\n
+        5. Each time you guess an incorrect letter, another limb will be added to the hangman!\n\n
+        6. Guess the word correctly without exhausting your lives, and you save the hangman!
+
+
+    </string>
+</resources>
