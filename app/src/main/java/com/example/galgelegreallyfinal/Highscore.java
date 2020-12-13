@@ -59,14 +59,12 @@ public class Highscore extends AppCompatActivity {
 
 
 
-        Log.d(TAG, "Arraylist of scores: " + allHSList);
-
         rv = (RecyclerView) findViewById(R.id.hsRV);
 
         rvLayout = new LinearLayoutManager(this);
 
         loadScoreData();
-
+        Log.d(TAG, "onCreate: " + allHSList);
         rvAdapter = new MainAdapter(allHSList);
         rv.setHasFixedSize(true); // performance sætter fixed size
 

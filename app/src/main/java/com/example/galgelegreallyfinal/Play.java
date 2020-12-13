@@ -44,6 +44,8 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_layout);
 
+        loadScoreData();
+
         Button menuBTN = (Button) findViewById(R.id.menuBTN);
 
         menuBTN.setOnClickListener(new View.OnClickListener() {
@@ -240,6 +242,8 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
             slutBesked = afslutSpil.create();
             slutBesked.show();
         }
+
+
     }
 
     private void imgChanger() {
