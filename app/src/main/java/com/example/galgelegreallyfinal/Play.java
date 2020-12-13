@@ -80,6 +80,12 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
         });
 
 
+        // dummy data
+        scoreArrList.add("80");
+        scoreArrList.add("70");
+        scoreArrList.add("60");
+        scoreArrList.add("50");
+
         // Knapper med listener
         Button A = findViewById(R.id.A);
         A.setOnClickListener(this);
@@ -279,7 +285,7 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
         }.getType();
         scoreArrList = gson.fromJson(json, type);
 
-        if (scoreArrList == null){
+        if (scoreArrList == null) {
             scoreArrList = new ArrayList<>();
         }
     }

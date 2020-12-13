@@ -57,16 +57,16 @@ public class Highscore extends AppCompatActivity {
         String prevGameHS = String.valueOf(sp.getInt("userScore", 0));
         HSbig.setText("Previous game score: " + prevGameHS);
 
-        allHSList.add("80");
-        allHSList.add("70");
-        allHSList.add("60");
-        allHSList.add("50");
+
 
         Log.d(TAG, "Arraylist of scores: " + allHSList);
 
         rv = (RecyclerView) findViewById(R.id.hsRV);
 
         rvLayout = new LinearLayoutManager(this);
+
+        loadScoreData();
+
         rvAdapter = new MainAdapter(allHSList);
         rv.setHasFixedSize(true); // performance sætter fixed size
 
