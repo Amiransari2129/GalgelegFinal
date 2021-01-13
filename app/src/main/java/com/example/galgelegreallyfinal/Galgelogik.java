@@ -21,7 +21,7 @@ public class Galgelogik {
     private String ordet;
     private ArrayList<String> brugteBogstaver = new ArrayList<String>();
     private String synligtOrd;
-    private int antalForkerteBogstaver, antalRigtigeBogstaver;
+    private int antalForkerteBogstaver, antalRigtigeBogstaver, antalForsøg;
     private boolean sidsteBogstavVarKorrekt;
     private boolean spilletErVundet;
     private boolean spilletErTabt;
@@ -55,6 +55,10 @@ public class Galgelogik {
         return antalForkerteBogstaver;
     }
 
+    public int getAntalForsøg(){
+        return antalForsøg;
+    }
+
     public int getAntalRigtigeBogstaver() {
         return antalRigtigeBogstaver;
     }
@@ -79,6 +83,8 @@ public class Galgelogik {
     public void nulstil() {
         brugteBogstaver.clear();
         antalForkerteBogstaver = 0;
+        antalRigtigeBogstaver = 0;
+        antalForsøg = 0;
         spilletErVundet = false;
         spilletErTabt = false;
         if (muligeOrd.isEmpty()) throw new IllegalStateException("Listen over ord er tom!");
@@ -123,6 +129,11 @@ public class Galgelogik {
                 spilletErTabt = true;
             }
         }
+        antalForsøg++;
+        opdaterSynligtOrd();
+    }
+
+    public void opdaterOrdplay(){
         opdaterSynligtOrd();
     }
 

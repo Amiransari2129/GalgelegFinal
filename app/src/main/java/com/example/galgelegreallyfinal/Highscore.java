@@ -52,19 +52,29 @@ public class Highscore extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Highscore.this, MainActivity.class));
+                finish();
             }
         });
         String prevGameHS = String.valueOf(sp.getInt("userScore", 0));
         HSbig.setText("Previous game score: " + prevGameHS);
 
+        // dummy data
+        allHSList.add(prevGameHS);
+        allHSList.add("1");
+        allHSList.add("2");
+        allHSList.add("3");
+        allHSList.add("4");
+        allHSList.add("5");
+
+//        loadScoreData();
 
 
         rv = (RecyclerView) findViewById(R.id.hsRV);
 
         rvLayout = new LinearLayoutManager(this);
 
-        loadScoreData();
-        Log.d(TAG, "onCreate: " + allHSList);
+        //loadScoreData();
+        Log.d(TAG, "allHSlist: " + allHSList);
         rvAdapter = new MainAdapter(allHSList);
         rv.setHasFixedSize(true); // performance sætter fixed size
 
@@ -80,7 +90,7 @@ public class Highscore extends AppCompatActivity {
     private void loadScoreData() {
         SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
         Gson gson = new Gson();
-        String json = sp.getString("score_pref", null);
+        String json = sp.getString("scoreList", null);
         Type type = new TypeToken<ArrayList<ScoreExample>>() {
         }.getType();
         allHSList = gson.fromJson(json, type);

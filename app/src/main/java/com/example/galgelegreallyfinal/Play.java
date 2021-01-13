@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import android.os.Handler;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
+
 public class Play extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = "Play";
 
@@ -34,17 +36,21 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
     TextView skjultOrd, tvScore;
     ImageView galgeIMG;
     AlertDialog.Builder afslutSpil;
-    int score = 0;
+    int score = 0, tempScore = 0;
+
+    SharedPreferences sp;
+    SharedPreferences.Editor edit;
 
     // Sp til HS fyldt med score.
-    ArrayList<String> scoreArrList = new ArrayList<>();
+
+    private ArrayList<String> scoreArrList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.play_layout);
 
-        loadScoreData();
+        //loadScoreData();
 
         Button menuBTN = (Button) findViewById(R.id.menuBTN);
 
@@ -52,6 +58,7 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Play.this, MainActivity.class));
+                finish();
             }
         });
 
@@ -80,13 +87,6 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                 e.printStackTrace();
             }
         });
-
-
-        // dummy data
-        scoreArrList.add("80");
-        scoreArrList.add("70");
-        scoreArrList.add("60");
-        scoreArrList.add("50");
 
         // Knapper med listener
         Button A = findViewById(R.id.A);
@@ -169,7 +169,6 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
 
     }
 
-
     private int points() {
 
         if (spil.erSidsteBogstavKorrekt()) {
@@ -183,19 +182,48 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void slutSpil() {
-        AlertDialog slutBesked;
-        SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = sp.edit();
+        sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
+        edit = sp.edit();
+
+        int stateIndic = 0;
+
+        tempScore = score;
+
+        if (spil.erSpilletVundet()) {
+            stateIndic = 1;
+            edit.putInt("userScore", tempScore);
+            edit.putInt("userTries", spil.getAntalForsøg());
+            edit.putInt("state", stateIndic);
+            edit.commit();
+            startActivity(new Intent(Play.this, GameOver.class));
+            finish();
+        } else if (spil.erSpilletTabt()){
+            stateIndic = 0;
+            edit.putInt("userScore", tempScore);
+            edit.putString("prevWord", spil.getOrdet());
+            edit.putInt("state", stateIndic);
+            edit.commit();
+            startActivity(new Intent(Play.this, GameOver.class));
+            finish();
+        }
+
+        /*AlertDialog slutBesked;
 
         if (spil.erSpilletVundet()) {
 
-            afslutSpil.setMessage("You Have won! with a score of " + score + "\nThe word was '" + spil.getOrdet() + "'");
+            afslutSpil.setMessage("You Have won! with a score of: " + score + "\nYou used " + spil.getAntalForsøg() + " tries.");
             afslutSpil.setCancelable(true);
 
             afslutSpil.setPositiveButton("New Game", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    startActivity(new Intent(Play.this, Play.class));
+                   startActivity(new Intent(Play.this, Play.class));
                     dialog.cancel();
+                    spil.nulstil();
+                    skjultOrd.setText(spil.getSynligtOrd());
+                    resetKeyboard();
+                    tvScore.setText("Score: " + score);
+                    spil.logStatus();
+                  //  finish();
                 }
             });
 
@@ -203,14 +231,10 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                 public void onClick(DialogInterface dialog, int id) {
                     startActivity(new Intent(Play.this, MainActivity.class));
                     dialog.cancel();
+                    scoreData();
+                    finish();
                 }
             });
-
-            scoreArrList.add(String.valueOf(score));
-            scoreData();
-
-            edit.putInt("userScore", score);
-            edit.commit();
 
             slutBesked = afslutSpil.create();
             slutBesked.show();
@@ -223,8 +247,14 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
 
             afslutSpil.setPositiveButton("New Game", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    startActivity(new Intent(Play.this, Play.class));
+                   // startActivity(new Intent(Play.this, Play.class));
                     dialog.cancel();
+                    spil.nulstil();
+                    skjultOrd.setText(spil.getSynligtOrd());
+                    resetKeyboard();
+                    tvScore.setText("Score: " + score);
+                    spil.logStatus();
+                   // finish();
                 }
             });
 
@@ -232,19 +262,15 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                 public void onClick(DialogInterface dialog, int id) {
                     startActivity(new Intent(Play.this, MainActivity.class));
                     dialog.cancel();
+                    scoreData();
+                    finish();
                 }
             });
-
-            scoreArrList.add(String.valueOf(score));
-            scoreData();
-
-            edit.putInt("userScore", score);
-            edit.commit();
 
             slutBesked = afslutSpil.create();
             slutBesked.show();
         }
-
+                */
 
     }
 
@@ -276,16 +302,17 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
 
     // nåede ikke at få det til at virke.
     private void scoreData() {
-        SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = sp.edit();
+        sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
+        edit = sp.edit();
         Gson gson = new Gson();
         String json = gson.toJson(scoreArrList);
         edit.putString("scoreList", json);
+        edit.putInt("userScore", tempScore);
         edit.commit();
     }
 
     private void loadScoreData() {
-        SharedPreferences sp = getSharedPreferences("score_pref", Context.MODE_PRIVATE);
+        edit = sp.edit();
         Gson gson = new Gson();
         String json = sp.getString("score_pref", null);
         Type type = new TypeToken<ArrayList<ScoreExample>>() {
@@ -564,6 +591,120 @@ public class Play extends AppCompatActivity implements View.OnClickListener {
                 System.out.println("Unavailable");
                 break;
         }
+    }
+
+    public void resetgame() {
+        scoreArrList.add(String.valueOf(score));
+        score = 0;
+        spil.nulstil();
+        skjultOrd.setText(spil.getSynligtOrd());
+        tvScore.setText("Score: " + score);
+        spil.logStatus();
+
+        View v;
+        v = findViewById(R.id.A);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.B);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.C);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.D);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.E);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.F);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.G);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.H);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.I);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.J);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.K);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.L);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.M);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.N);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.O);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.P);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.Q);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.argh);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.S);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.T);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.U);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.V);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.W);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.X);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.Y);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
+
+        v = findViewById(R.id.Z);
+        v.getBackground().setAlpha(250);
+        v.setEnabled(true);
     }
 }
 

@@ -12,10 +12,26 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Play"></activity>
-        <activity android:name=".Help"></activity>
-        <activity android:name=".Highscore"></activity>
-        <activity android:name=".WordList"></activity>
+        <activity android:name=".GameOver"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".Play"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".Help"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".Highscore"
+            android:screenOrientation="portrait">
+
+        </activity>
+        <activity android:name=".WordList"
+            android:screenOrientation="portrait">
+
+        </activity>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
